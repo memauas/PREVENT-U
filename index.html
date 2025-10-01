@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Mapa de Sensores en el Pie</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .foot-container {
+      position: relative;
+      display: inline-block;
+    }
+    .foot-image {
+      width: 550px; /* Ajusta el tamaño */
+    }
+    .sensorT {
+      position: absolute;
+      font-weight: bold;
+      color: black;
+      background: rgba(255, 0, 0, 0.3); /* transparente rojizo */
+      padding: 1px 2px;
+      border-radius: 2px;
+    }
+    .sensorP {
+      position: absolute;
+      font-weight: bold;
+      color: black;
+      background: rgba(125, 143, 205, 0.189); /* transparente rojizo */
+      padding: 1px 2px;
+      border-radius: 2px;
+    }
+    /* Ajuste de posiciones */
+    #temp-heel   { top: 470px; left: 120px; } /* Talón */
+    #temp-side   { top: 290px; left: 50px; } /* Lateral externo */
+    #temp-hallux { top: 50px; left: 125px; } /* Hallux (dedo gordo) */
+    #temp-met1   { top: 100px; left: 190px; } /* Cabeza 1er metatarsiano */
+    #temp-met3   { top: 100px; left: 100px; } /* Cabeza 3er metatarsiano */
+    #temp-met5   { top: 100px; left: 30px; } /* Cabeza 5to metatarsiano */
+
+    #press-heel   { top: 490px; left: 120px; } /* Talón */
+    #press-met1   { top: 120px; left: 190px; } /* 1er metatarsiano */
+    #press-met5   { top: 120px; left: 30px; } /* 5to metatarsiano */
+    #press-mid    { top: 310px; left: 100px; } /* Zona central */
+  </style>
+</head>
+<body class="text-center p-4">
+  <h2 class="mb-4">Mapa de Sensores en el Pie</h2>
+  <div class="foot-container">
+    <img src="pie.png"
+         alt="Huella del pie" class="foot-image">
+
+    <!-- Sensores de temperatura -->
+    <div id="temp-heel" class="sensorT">32.9 °C</div>
+    <div id="temp-side" class="sensorT">33.7 °C</div>
+    <div id="temp-hallux" class="sensorT">34.9 °C</div>
+    <div id="temp-met1" class="sensorT">34.4 °C</div>
+    <div id="temp-met3" class="sensorT">32.7 °C</div>
+    <div id="temp-met5" class="sensorT">30.8 °C</div>
+
+    <!-- Sensores de presión -->
+    <div id="press-heel" class="sensorP">117.0 N</div>
+    <div id="press-met1" class="sensorP">134.0 N</div>
+    <div id="press-met5" class="sensorP">99.5 N</div>
+    <div id="press-mid" class="sensorP">116.5 N</div>
+  </div>
+</body>
+</html>

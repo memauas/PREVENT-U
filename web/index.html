@@ -2,65 +2,218 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Mapa de Sensores en el Pie</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monitor de Sensores Podales</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    .foot-container {
-      position: relative;
-      display: inline-block;
-    }
-    .foot-image {
-      width: 550px; /* Ajusta el tamaño */
-    }
-    .sensorT {
-      position: absolute;
-      font-weight: bold;
-      color: black;
-      background: rgba(255, 0, 0, 0.3); /* transparente rojizo */
-      padding: 1px 2px;
-      border-radius: 2px;
-    }
-    .sensorP {
-      position: absolute;
-      font-weight: bold;
-      color: black;
-      background: rgba(125, 143, 205, 0.189); /* transparente rojizo */
-      padding: 1px 2px;
-      border-radius: 2px;
-    }
-    /* Ajuste de posiciones */
-    #temp-heel   { top: 470px; left: 120px; } /* Talón */
-    #temp-side   { top: 290px; left: 50px; } /* Lateral externo */
-    #temp-hallux { top: 50px; left: 125px; } /* Hallux (dedo gordo) */
-    #temp-met1   { top: 100px; left: 190px; } /* Cabeza 1er metatarsiano */
-    #temp-met3   { top: 100px; left: 100px; } /* Cabeza 3er metatarsiano */
-    #temp-met5   { top: 100px; left: 30px; } /* Cabeza 5to metatarsiano */
-
-    #press-heel   { top: 490px; left: 120px; } /* Talón */
-    #press-met1   { top: 120px; left: 190px; } /* 1er metatarsiano */
-    #press-met5   { top: 120px; left: 30px; } /* 5to metatarsiano */
-    #press-mid    { top: 310px; left: 100px; } /* Zona central */
-  </style>
+  <link rel="stylesheet" href="styles.css">
 </head>
-<body class="text-center p-4">
-  <h2 class="mb-4">Mapa de Sensores en el Pie</h2>
-  <div class="foot-container">
-    <img src="pie.png"
-         alt="Huella del pie" class="foot-image">
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="container">
+      <h1 class="title">Monitor de Sensores Podales</h1>
+      <p class="subtitle">Temperatura y Presión en Tiempo Real</p>
+    </div>
+  </header>
 
-    <!-- Sensores de temperatura -->
-    <div id="temp-heel" class="sensorT">32.9 °C</div>
-    <div id="temp-side" class="sensorT">33.7 °C</div>
-    <div id="temp-hallux" class="sensorT">34.9 °C</div>
-    <div id="temp-met1" class="sensorT">34.4 °C</div>
-    <div id="temp-met3" class="sensorT">32.7 °C</div>
-    <div id="temp-met5" class="sensorT">30.8 °C</div>
+  <!-- Main Content -->
+  <main class="container my-4">
+    <!-- Status Bar -->
+    <div class="status-bar">
+      <div class="status-item">
+        <span class="status-label">Estado:</span>
+        <span id="connection-status" class="status-value connected">Conectado</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">Última actualización:</span>
+        <span id="last-update" class="status-value">--:--:--</span>
+      </div>
+      <button id="refresh-btn" class="btn btn-primary btn-sm">
+        <span id="refresh-icon">🔄</span> Actualizar
+      </button>
+    </div>
 
-    <!-- Sensores de presión -->
-    <div id="press-heel" class="sensorP">117.0 N</div>
-    <div id="press-met1" class="sensorP">134.0 N</div>
-    <div id="press-met5" class="sensorP">99.5 N</div>
-    <div id="press-mid" class="sensorP">116.5 N</div>
-  </div>
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <div class="summary-card">
+          <h3>🌡️ Temperatura</h3>
+          <div class="summary-stats">
+            <div class="stat">
+              <span class="stat-label">Promedio</span>
+              <span id="avg-temp" class="stat-value">--°C</span>
+            </div>
+            <div class="stat">
+              <span class="stat-label">Máxima</span>
+              <span id="max-temp" class="stat-value">--°C</span>
+            </div>
+            <div class="stat">
+              <span class="stat-label">Mínima</span>
+              <span id="min-temp" class="stat-value">--°C</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="summary-card">
+          <h3>⚖️ Presión</h3>
+          <div class="summary-stats">
+            <div class="stat">
+              <span class="stat-label">Promedio</span>
+              <span id="avg-press" class="stat-value">-- N</span>
+            </div>
+            <div class="stat">
+              <span class="stat-label">Máxima</span>
+              <span id="max-press" class="stat-value">-- N</span>
+            </div>
+            <div class="stat">
+              <span class="stat-label">Mínima</span>
+              <span id="min-press" class="stat-value">-- N</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feet Visualization -->
+    <div class="row">
+      <!-- Left Foot -->
+      <div class="col-lg-6 mb-4">
+        <div class="foot-card">
+          <h3 class="foot-title">Pie Izquierdo</h3>
+          <div class="foot-container">
+            <img src="images/pie_izquierdo.png" alt="Pie Izquierdo" class="foot-image">
+            
+            <!-- Temperature Sensors - Left Foot -->
+            <div id="left-temp-heel" class="sensor sensor-temp" data-position="top: 470px; left: 120px;">
+              <span class="sensor-value">--</span>
+              <span class="sensor-unit">°C</span>
+            </div>
+            <div id="left-temp-side" class="sensor sensor-temp" data-position="top: 290px; left: 50px;">
+              <span class="sensor-value">--</span>
+              <span class="sensor-unit">°C</span>
+            </div>
+            <div id="left-temp-hallux" class="sensor sensor-temp" data-position="top: 50px; left: 125px;">
+              <span class="sensor-value">--</span>
+              <span class="sensor-unit">°C</span>
+            </div>
+            <div id="left-temp-met1" class="sensor sensor-temp" data-position="top: 100px; left: 190px;">
+              <span class="sensor-value">--</span>
+              <span class="sensor-unit">°C</span>
+            </div>
+            <div id="left-temp-met3" class="sensor sensor-temp" data-position="top: 100px; left: 100px;">
+              <span class="sensor-value">--</span>
+              <span class="sensor-unit">°C</span>
+            </div>
+            <div id="left-temp-met5" class="sensor sensor-temp" data-position="top: 100px; left: 30px;">
+              <span class="sensor-value">--</span>
+              <span class="sensor-unit">°C</span>
+            </div>
+
+            <!-- Pressure Sensors - Left Foot -->
+            <div id="left-press-heel" class="sensor sensor-press" data-position="top: 490px; left: 120px;">
+              <span class="sensor-value">--</span>
+              <span class="sensor-unit">N</span>
+            </div>
+            <div id="left-press-met1" class="sensor sensor-press" data-position="top: 120px; left: 190px;">
+              <span class="sensor-value">--</span>
+              <span class="sensor-unit">N</span>
+            </div>
+            <div id="left-press-met5" class="sensor sensor-press" data-position="top: 120px; left: 30px;">
+              <span class="sensor-value">--</span>
+              <span class="sensor-unit">N</span>
+            </div>
+            <div id="left-press-mid" class="sensor sensor-press" data-position="top: 310px; left: 100px;">
+              <span class="sensor-value">--</span>
+              <span class="sensor-unit">N</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Foot -->
+      <div class="col-lg-6 mb-4">
+        <div class="foot-card">
+          <h3 class="foot-title">Pie Derecho</h3>
+          <div class="foot-container">
+            <img src="images/pie_izquierdo.png" alt="Pie Derecho" class="foot-image foot-image-flipped">
+            
+            <!-- Temperature Sensors - Right Foot (mirrored positions) -->
+            <div id="right-temp-heel" class="sensor sensor-temp" data-position="top: 470px; right: 120px;">
+              <span class="sensor-value">--</span>
+              <span class="sensor-unit">°C</span>
+            </div>
+            <div id="right-temp-side" class="sensor sensor-temp" data-position="top: 290px; right: 50px;">
+              <span class="sensor-value">--</span>
+              <span class="sensor-unit">°C</span>
+            </div>
+            <div id="right-temp-hallux" class="sensor sensor-temp" data-position="top: 50px; right: 125px;">
+              <span class="sensor-value">--</span>
+              <span class="sensor-unit">°C</span>
+            </div>
+            <div id="right-temp-met1" class="sensor sensor-temp" data-position="top: 100px; right: 190px;">
+              <span class="sensor-value">--</span>
+              <span class="sensor-unit">°C</span>
+            </div>
+            <div id="right-temp-met3" class="sensor sensor-temp" data-position="top: 100px; right: 100px;">
+              <span class="sensor-value">--</span>
+              <span class="sensor-unit">°C</span>
+            </div>
+            <div id="right-temp-met5" class="sensor sensor-temp" data-position="top: 100px; right: 30px;">
+              <span class="sensor-value">--</span>
+              <span class="sensor-unit">°C</span>
+            </div>
+
+            <!-- Pressure Sensors - Right Foot (mirrored positions) -->
+            <div id="right-press-heel" class="sensor sensor-press" data-position="top: 490px; right: 120px;">
+              <span class="sensor-value">--</span>
+              <span class="sensor-unit">N</span>
+            </div>
+            <div id="right-press-met1" class="sensor sensor-press" data-position="top: 120px; right: 190px;">
+              <span class="sensor-value">--</span>
+              <span class="sensor-unit">N</span>
+            </div>
+            <div id="right-press-met5" class="sensor sensor-press" data-position="top: 120px; right: 30px;">
+              <span class="sensor-value">--</span>
+              <span class="sensor-unit">N</span>
+            </div>
+            <div id="right-press-mid" class="sensor sensor-press" data-position="top: 310px; right: 100px;">
+              <span class="sensor-value">--</span>
+              <span class="sensor-unit">N</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detailed Data Table -->
+    <div class="data-table-container">
+      <h3 class="table-title">Datos Detallados de Sensores</h3>
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Ubicación</th>
+              <th>Tipo</th>
+              <th>Pie Izquierdo</th>
+              <th>Pie Derecho</th>
+            </tr>
+          </thead>
+          <tbody id="sensor-data-table">
+            <!-- Populated by JavaScript -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; 2025 Monitor de Sensores Podales - ITBA IB2</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
 </body>
 </html>

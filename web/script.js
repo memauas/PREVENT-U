@@ -261,11 +261,19 @@ function updateDataTable() {
   const tempLocations = ['heel', 'side', 'hallux', 'met1', 'met3', 'met5'];
   tempLocations.forEach(location => {
     if (sensorData.left.temperature[location] !== undefined) {
+      const leftTemp = sensorData.left.temperature[location];
+      const rightTemp = sensorData.right.temperature[location];
+      const diff = Math.abs(leftTemp - rightTemp).toFixed(1);
+      const isCritical = diff > 2.2;
+      const diffClass = isCritical ? 'value-critical' : 'value-normal';
+      const diffDisplay = `${diff} °C${isCritical ? ' ⚠️' : ''}`;
+
       const row = createTableRow(
         sensorLabels[location] || location,
         'Temperatura',
-        `${sensorData.left.temperature[location]} °C`,
-        `${sensorData.right.temperature[location]} °C`,
+        `${leftTemp} °C`,
+        `${rightTemp} °C`,
+        `<span class="${diffClass}">${diffDisplay}</span>`,
         'temp'
       );
       tableBody.appendChild(row);
@@ -276,11 +284,23 @@ function updateDataTable() {
   const pressLocations = ['heel', 'met1', 'met5', 'mid'];
   pressLocations.forEach(location => {
     if (sensorData.left.pressure[location] !== undefined) {
+      const leftPress = sensorData.left.pressure[location];
+      const rightPress = sensorData.right.pressure[location];
+      const leftCritical = leftPress > 700;
+      const rightCritical = rightPress > 700;
+      const leftClass = leftCritical ? 'value-critical' : 'value-normal';
+      const rightClass = rightCritical ? 'value-critical' : 'value-normal';
+      
+      const leftDisplay = `${leftPress} N${leftCritical ? ' ⚠️' : ''}`;
+      const rightDisplay = `${rightPress} N${rightCritical ? ' ⚠️' : ''}`;
+      
+      
       const row = createTableRow(
         sensorLabels[location] || location,
         'Presión',
-        `${sensorData.left.pressure[location]} N`,
-        `${sensorData.right.pressure[location]} N`,
+        `<span class="${leftClass}">${leftDisplay}</span>`,
+        `<span class="${rightClass}">${rightDisplay}</span>`,
+        '--',
         'press'
       );
       tableBody.appendChild(row);
@@ -288,19 +308,18 @@ function updateDataTable() {
   });
 }
 
-/**
- * Create a table row element
- */
-function createTableRow(location, type, leftValue, rightValue, badgeType) {
+function createTableRow(location, type, leftValue, rightValue, difference, badgeType) {
   const row = document.createElement('tr');
   row.innerHTML = `
     <td><strong>${location}</strong></td>
     <td><span class="sensor-type-badge badge-${badgeType}">${type}</span></td>
     <td>${leftValue}</td>
     <td>${rightValue}</td>
+    <td>${difference}</td>
   `;
   return row;
 }
+
 
 /**
  * Update connection status indicator

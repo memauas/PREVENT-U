@@ -256,7 +256,7 @@ body {
 #left-press-heel { top: 980px; left: 210px; }
 #left-press-met1 { top: 210px; left: 300px; }
 #left-press-met5 { top: 230px; left: 100px; }
-#left-press-mid { top: 560px; left: 200px; }
+#left-press-mid { top: 560px; left: 80px; }
 
 /* Position sensors - Right Foot */
 #right-temp-heel { top: 950px; right: 210px; }
@@ -269,7 +269,7 @@ body {
 #right-press-heel { top: 980px; right: 210px; }
 #right-press-met1 { top: 210px; right: 300px; }
 #right-press-met5 { top: 230px; right: 100px; }
-#right-press-mid { top: 560px; right: 200px; }
+#right-press-mid { top: 560px; right: 80px; }
 
 /* ============================================
    Data Table
@@ -487,4 +487,27 @@ body {
 
 .fade-in {
   animation: fadeIn 0.5s ease-in-out;
+}
+/* ============================================
+   Value Highlighting
+   ============================================ */
+.value-normal {
+  color: #333;
+  font-weight: 300;
+}
+
+.value-critical {
+  color: #dc3545; /* rojo estilo Bootstrap */
+  font-weight: 700;
+  animation: pulse 1.2s ease-in-out infinite alternate;
+}
+
+/* Efecto leve de atención para valores críticos */
+@keyframes pulse {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.6;
+  }
 }

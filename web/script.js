@@ -7,9 +7,8 @@
 // Configuration
 // ============================================
 const CONFIG = {
-  updateInterval: 2000, // Update interval in milliseconds
-  apiEndpoint: '/api/sensors', // API endpoint (to be configured)
-  autoRefresh: true
+  websocketUrl: null, // Will be auto-detected from current host
+  reconnectInterval: 3000 // WebSocket reconnect interval in milliseconds
 };
 
 // ============================================
@@ -62,24 +61,26 @@ const sensorLabels = {
 };
 
 // ============================================
+// WebSocket Management
+// ============================================
+let websocket = null;
+let reconnectTimeout = null;
+let isReconnecting = false;
+
+// ============================================
 // Initialization
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
   console.log('Sensor Dashboard Initialized');
   
-  // Initialize with sample data
-  generateSampleData();
-  
-  // Update display
+  // Initialize display
   updateDisplay();
   
   // Setup event listeners
   setupEventListeners();
   
-  // Start auto-refresh if enabled
-  if (CONFIG.autoRefresh) {
-    startAutoRefresh();
-  }
+  // Connect to WebSocket
+  connectWebSocket();
   
   // Apply fade-in animation
   document.querySelectorAll('.summary-card, .foot-card, .data-table-container').forEach((el, index) => {
@@ -97,7 +98,11 @@ function setupEventListeners() {
   
   refreshBtn.addEventListener('click', () => {
     refreshBtn.classList.add('rotating');
-    refreshData();
+    
+    // Reconnect WebSocket if disconnected
+    if (!websocket || websocket.readyState !== WebSocket.OPEN) {
+      connectWebSocket();
+    }
     
     setTimeout(() => {
       refreshBtn.classList.remove('rotating');
@@ -106,69 +111,134 @@ function setupEventListeners() {
 }
 
 // ============================================
-// Data Management
+// WebSocket Functions
 // ============================================
 
 /**
- * Generate sample sensor data for demonstration
+ * Connect to WebSocket server
  */
-function generateSampleData() {
-  // Left foot temperature
-  sensorData.left.temperature.heel = (30 + Math.random() * 5).toFixed(1);
-  sensorData.left.temperature.side = (31 + Math.random() * 5).toFixed(1);
-  sensorData.left.temperature.hallux = (32 + Math.random() * 5).toFixed(1);
-  sensorData.left.temperature.met1 = (31 + Math.random() * 5).toFixed(1);
-  sensorData.left.temperature.met3 = (30 + Math.random() * 5).toFixed(1);
-  sensorData.left.temperature.met5 = (29 + Math.random() * 5).toFixed(1);
+function connectWebSocket() {
+  // Auto-detect WebSocket URL from current host
+  const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+  const wsHost = window.location.hostname;
+  const wsPort = window.location.port || '80';
+  const wsUrl = CONFIG.websocketUrl || `${wsProtocol}//${wsHost}/ws`;
   
-  // Left foot pressure
-  sensorData.left.pressure.heel = (100 + Math.random() * 40).toFixed(1);
-  sensorData.left.pressure.met1 = (110 + Math.random() * 40).toFixed(1);
-  sensorData.left.pressure.met5 = (90 + Math.random() * 30).toFixed(1);
-  sensorData.left.pressure.mid = (95 + Math.random() * 40).toFixed(1);
+  console.log(`Connecting to WebSocket: ${wsUrl}`);
   
-  // Right foot temperature
-  sensorData.right.temperature.heel = (30 + Math.random() * 5).toFixed(1);
-  sensorData.right.temperature.side = (31 + Math.random() * 5).toFixed(1);
-  sensorData.right.temperature.hallux = (32 + Math.random() * 5).toFixed(1);
-  sensorData.right.temperature.met1 = (31 + Math.random() * 5).toFixed(1);
-  sensorData.right.temperature.met3 = (30 + Math.random() * 5).toFixed(1);
-  sensorData.right.temperature.met5 = (29 + Math.random() * 5).toFixed(1);
-  
-  // Right foot pressure
-  sensorData.right.pressure.heel = (100 + Math.random() * 40).toFixed(1);
-  sensorData.right.pressure.met1 = (110 + Math.random() * 40).toFixed(1);
-  sensorData.right.pressure.met5 = (90 + Math.random() * 30).toFixed(1);
-  sensorData.right.pressure.mid = (95 + Math.random() * 40).toFixed(1);
+  try {
+    websocket = new WebSocket(wsUrl);
+    
+    websocket.onopen = onWebSocketOpen;
+    websocket.onmessage = onWebSocketMessage;
+    websocket.onerror = onWebSocketError;
+    websocket.onclose = onWebSocketClose;
+    
+  } catch (error) {
+    console.error('WebSocket connection error:', error);
+    updateConnectionStatus(false);
+    scheduleReconnect();
+  }
 }
 
 /**
- * Fetch data from API or sensor source
- * This is a placeholder - replace with actual API call
+ * Handle WebSocket open event
  */
-async function fetchSensorData() {
-  // TODO: Implement actual API call
-  // Example:
-  // try {
-  //   const response = await fetch(CONFIG.apiEndpoint);
-  //   const data = await response.json();
-  //   return data;
-  // } catch (error) {
-  //   console.error('Error fetching sensor data:', error);
-  //   updateConnectionStatus(false);
-  //   return null;
-  // }
-  
-  // For now, generate sample data
-  generateSampleData();
+function onWebSocketOpen(event) {
+  console.log('WebSocket connected successfully');
   updateConnectionStatus(true);
+  isReconnecting = false;
+  
+  // Clear any pending reconnect attempts
+  if (reconnectTimeout) {
+    clearTimeout(reconnectTimeout);
+    reconnectTimeout = null;
+  }
 }
+
+/**
+ * Handle incoming WebSocket messages
+ */
+function onWebSocketMessage(event) {
+  try {
+    const data = JSON.parse(event.data);
+    console.log('Received sensor data:', data);
+    
+    // Update sensor data
+    if (data.left) {
+      if (data.left.temperature) {
+        Object.assign(sensorData.left.temperature, data.left.temperature);
+      }
+      if (data.left.pressure) {
+        Object.assign(sensorData.left.pressure, data.left.pressure);
+      }
+    }
+    
+    if (data.right) {
+      if (data.right.temperature) {
+        Object.assign(sensorData.right.temperature, data.right.temperature);
+      }
+      if (data.right.pressure) {
+        Object.assign(sensorData.right.pressure, data.right.pressure);
+      }
+    }
+    
+    // Update display
+    updateDisplay();
+    
+  } catch (error) {
+    console.error('Error parsing WebSocket message:', error);
+  }
+}
+
+/**
+ * Handle WebSocket errors
+ */
+function onWebSocketError(event) {
+  console.error('WebSocket error:', event);
+  updateConnectionStatus(false);
+}
+
+/**
+ * Handle WebSocket close event
+ */
+function onWebSocketClose(event) {
+  console.log('WebSocket closed:', event.code, event.reason);
+  updateConnectionStatus(false);
+  
+  // Attempt to reconnect if not intentionally closed
+  if (!isReconnecting) {
+    scheduleReconnect();
+  }
+}
+
+/**
+ * Schedule a reconnection attempt
+ */
+function scheduleReconnect() {
+  if (isReconnecting) return;
+  
+  isReconnecting = true;
+  console.log(`Reconnecting in ${CONFIG.reconnectInterval / 1000} seconds...`);
+  
+  reconnectTimeout = setTimeout(() => {
+    console.log('Attempting to reconnect...');
+    connectWebSocket();
+  }, CONFIG.reconnectInterval);
+}
+
+// ============================================
+// Data Management
+// ============================================
 
 /**
  * Refresh all sensor data
  */
 function refreshData() {
-  fetchSensorData();
+  // Reconnect WebSocket if disconnected
+  if (!websocket || websocket.readyState !== WebSocket.OPEN) {
+    connectWebSocket();
+  }
   updateDisplay();
 }
 
@@ -349,31 +419,6 @@ function updateTimestamp() {
 }
 
 // ============================================
-// Auto-refresh
-// ============================================
-let refreshInterval = null;
-
-function startAutoRefresh() {
-  if (refreshInterval) {
-    clearInterval(refreshInterval);
-  }
-  
-  refreshInterval = setInterval(() => {
-    refreshData();
-  }, CONFIG.updateInterval);
-  
-  console.log(`Auto-refresh started (${CONFIG.updateInterval}ms interval)`);
-}
-
-function stopAutoRefresh() {
-  if (refreshInterval) {
-    clearInterval(refreshInterval);
-    refreshInterval = null;
-    console.log('Auto-refresh stopped');
-  }
-}
-
-// ============================================
 // Public API
 // ============================================
 
@@ -416,7 +461,6 @@ window.SensorDashboard = {
   updateSensorData,
   getSensorData,
   refreshData,
-  startAutoRefresh,
-  stopAutoRefresh,
+  connectWebSocket,
   CONFIG
 };

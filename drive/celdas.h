@@ -7,8 +7,8 @@
 #define N_CELDAS 8
 
 // Pines para las celdas (DT) y SCK compartido
-const int PINS_DT[N_CELDAS] = {5, 17, 16, 4, 15, 14, 12, 13}; 
-const int PIN_SCK = 18;
+const int PINS_DT[N_CELDAS] = {23, 3, 18, 5, 17, 16, 4, 2}; 
+const int PIN_SCK = 23;
 
 // Tiempo de espera para la lectura de la HX711 (puede ser 0, pero se usa para manejar latencia)
 // La lectura de la HX711 es bloqueante si está lista, pero usamos el flag para llamarla solo a intervalos.
@@ -38,5 +38,6 @@ private:
     // Función auxiliar de cálculo
     float calculatePressure(float weight_g) const;
 };
+
 
 #endif

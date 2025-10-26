@@ -9,10 +9,10 @@
 #define N_TERMISTORES 10    // total de termistores
 
 // Pines del multiplexor 
-#define MUX_S0 26
-#define MUX_S1 25
-#define MUX_S2 33
-#define MUX_S3 32
+#define MUX_S0 13
+#define MUX_S1 14
+#define MUX_S2 27
+#define MUX_S3 26
 
 // Constante del ADS1115 (mV/bit con GAIN_ONE)
 #define MV_PER_BIT 0.125 
@@ -51,5 +51,6 @@ private:
     void seleccionarCanal(int canal); 
     float calculateTempC(int16_t rawADC, const Termistor &t); // Función de cálculo
 };
+
 
 #endif

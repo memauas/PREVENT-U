@@ -82,6 +82,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // Connect to WebSocket
   connectWebSocket();
   
+  // Botones
+  document.getElementById("guardar-btn")?.addEventListener("click", guardarDatos);
+  document.getElementById("descargar-btn")?.addEventListener("click", descargarCSV);
+
   // Apply fade-in animation
   document.querySelectorAll('.summary-card, .foot-card, .data-table-container').forEach((el, index) => {
     setTimeout(() => {
@@ -464,3 +468,72 @@ window.SensorDashboard = {
   connectWebSocket,
   CONFIG
 };
+
+function guardarDatos() {
+    const fecha = new Date().toLocaleString();
+
+    // Recolectar datos de sensores
+    const datos = {
+        fecha: fecha,
+        temperatura: { izquierda: {}, derecha: {} },
+        presion: { izquierda: {}, derecha: {} }
+    };
+
+    // Sensores de temperatura
+    ["heel", "side", "hallux", "met1", "met3", "met5"].forEach(loc => {
+        datos.temperatura.izquierda[loc] = document.querySelector(`#left-temp-${loc} .sensor-value`)?.textContent || "";
+        datos.temperatura.derecha[loc] = document.querySelector(`#right-temp-${loc} .sensor-value`)?.textContent || "";
+    });
+
+    // Sensores de presión
+    ["heel", "met1", "met5", "mid"].forEach(loc => {
+        datos.presion.izquierda[loc] = document.querySelector(`#left-press-${loc} .sensor-value`)?.textContent || "";
+        datos.presion.derecha[loc] = document.querySelector(`#right-press-${loc} .sensor-value`)?.textContent || "";
+    });
+
+    // Guardar en historial de localStorage
+    let historial = JSON.parse(localStorage.getItem("historialSensores")) || [];
+    historial.push(datos);
+    localStorage.setItem("historialSensores", JSON.stringify(historial));
+
+    // Aviso visual
+    alert("✅ Datos guardados correctamente");
+}
+function descargarCSV() {
+    const historial = JSON.parse(localStorage.getItem("historialSensores")) || [];
+    if (historial.length === 0) {
+        alert("⚠️ No hay datos para descargar");
+        return;
+    }
+
+    const tempKeys = ["heel", "side", "hallux", "met1", "met3", "met5"];
+    const pressKeys = ["heel", "met1", "met5", "mid"];
+
+    let headers = ["Fecha", "Sensor", "Pie Izquierdo", "Pie Derecho"];
+    let csv = headers.join(",") + "\n";
+
+    historial.forEach(entry => {
+        // Temperatura
+        tempKeys.forEach(k => {
+            const left = entry.temperatura.izquierda[k] || "0";
+            const right = entry.temperatura.derecha[k] || "0";
+            csv += `"${entry.fecha}","Temp ${k}","${left}","${right}"\n`;
+        });
+
+        // Presión
+        pressKeys.forEach(k => {
+            const left = entry.presion.izquierda[k] || "0";
+            const right = entry.presion.derecha[k] || "0";
+            csv += `"${entry.fecha}","Press ${k}","${left}","${right}"\n`;
+        });
+    });
+
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `historial_sensores_${new Date().toISOString()}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+

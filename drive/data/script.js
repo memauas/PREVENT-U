@@ -506,29 +506,36 @@ function descargarCSV() {
         return;
     }
 
-    const tempKeys = ["heel", "side", "hallux", "met1", "met3", "met5"];
+    // Sensores a incluir
+    const tempKeys = ["heel", "side", "hallux", "met1", "met5"];
     const pressKeys = ["heel", "met1", "met5", "mid"];
 
-    let headers = ["Fecha", "Sensor", "Pie Izquierdo", "Pie Derecho"];
-    let csv = headers.join(",") + "\n";
+    // Etiquetas en español
+    const labels = {
+        heel: "Talón",
+        side: "Lateral Externo",
+        hallux: "Hallux (Dedo Gordo)",
+        met1: "1er Metatarsiano",
+        met5: "5to Metatarsiano",
+        mid: "Zona Central"
+    };
+
+    let csv = "";
 
     historial.forEach(entry => {
-        // Temperatura
-        tempKeys.forEach(k => {
-            const left = entry.temperatura.izquierda[k] || "0";
-            const right = entry.temperatura.derecha[k] || "0";
-            csv += `"${entry.fecha}","Temp ${k}","${left}","${right}"\n`;
-        });
+        // --- Temperatura ---
+        csv += `Fecha: ${entry.fecha}\n`;
+        csv += "Sensores Temperatura," + tempKeys.map(k => labels[k]).join(",") + "\n";
+        csv += "Pie Izquierdo," + tempKeys.map(k => entry.temperatura.izquierda[k] || "").join(",") + "\n";
+        csv += "Pie Derecho," + tempKeys.map(k => entry.temperatura.derecha[k] || "").join(",") + "\n\n";
 
-        // Presión
-        pressKeys.forEach(k => {
-            const left = entry.presion.izquierda[k] || "0";
-            const right = entry.presion.derecha[k] || "0";
-            csv += `"${entry.fecha}","Press ${k}","${left}","${right}"\n`;
-        });
+        // --- Presión ---
+        csv += "Sensores Presión," + pressKeys.map(k => labels[k]).join(",") + "\n";
+        csv += "Pie Izquierdo," + pressKeys.map(k => entry.presion.izquierda[k] || "").join(",") + "\n";
+        csv += "Pie Derecho," + pressKeys.map(k => entry.presion.derecha[k] || "").join(",") + "\n\n";
     });
 
-    const blob = new Blob([csv], { type: "text/csv" });
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -536,4 +543,6 @@ function descargarCSV() {
     a.click();
     URL.revokeObjectURL(url);
 }
+
+
 

@@ -9,7 +9,7 @@
 
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #780518 0%, #a24b74 100%);
   min-height: 100vh;
   color: #333;
 }
@@ -22,12 +22,29 @@ body {
    Header
    ============================================ */
 .header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #ea6690 0%, #764ba2 100%);
   color: white;
   padding: 2rem 0;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   margin-bottom: 2rem;
 }
+
+/* Contenedor interno del header */
+.header-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;    /* centra horizontal */
+  justify-content: center; /* centra vertical */
+  text-align: center;
+}
+
+/* Imagen del header */
+.header-logo {
+  height: 120px;          /* ajustá el tamaño acá */
+  object-fit: contain;    /* mantiene proporciones */
+  margin-bottom: 0.5rem;
+}
+
 
 .title {
   font-size: 2.5rem;
@@ -76,7 +93,7 @@ body {
 }
 
 .status-value.connected {
-  color: #28a745;
+  color: #764ba2;
 }
 
 .status-value.disconnected {

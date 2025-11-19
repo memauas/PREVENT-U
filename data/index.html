@@ -11,11 +11,11 @@
 <body>
   <!-- Header -->
   <header class="header">
-    <div class="container">
-      <h1 class="title">Monitor de Sensores Podales</h1>
-      <p class="subtitle">Temperatura y Presión en Tiempo Real</p>
-    </div>
+  <div class="container header-container">
+    <img src="images/LogoPrevent_FondoTransparente.png" alt="Logo PREVENT-U" class="header-logo">
+  </div>
   </header>
+
 
   <!-- Main Content -->
   <main class="container my-4">
@@ -134,7 +134,6 @@
           <h3 class="foot-title">Pie Derecho</h3>
           <div class="foot-container">
             <img src="images/pie_izquierdo.png" alt="Pie Derecho" class="foot-image foot-image-flipped">
-            png
             <!-- Temperature Sensors - Right Foot (mirrored positions) -->
             <div id="right-temp-heel" class="sensor sensor-temp" data-position="top: 470px; right: 120px;">
               <span class="sensor-value">--</span>
@@ -201,9 +200,9 @@
     </div>
     
   </main>
-  <div class="d-flex gap-2 mt-3">
-  <button id="guardar-btn" class="btn btn-primary">💾 Guardar Datos</button>
-  <button id="descargar-btn" class="btn btn-success">📥 Descargar CSV</button>
+  <div class="d-flex gap-2 mt-3 justify-content-center mb-4">
+  <button id="guardar-btn" class="btn btn-light">💾 Guardar Datos</button>
+  <button id="descargar-btn" class="btn btn-light">📥 Descargar CSV</button>
   </div>
 
   <script src="script.js"></script>

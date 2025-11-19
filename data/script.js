@@ -8,7 +8,7 @@
 // ============================================
 const CONFIG = {
   websocketUrl: null, // Will be auto-detected from current host
-  reconnectInterval: 3000 // WebSocket reconnect interval in milliseconds
+  reconnectInterval: 3000 // Si no se pudo conectar vuelve a intentar en 3 segs
 };
 
 // ============================================
@@ -21,7 +21,6 @@ const sensorData = {
       side: 0,
       hallux: 0,
       met1: 0,
-      met3: 0,
       met5: 0
     },
     pressure: {
@@ -37,7 +36,6 @@ const sensorData = {
       side: 0,
       hallux: 0,
       met1: 0,
-      met3: 0,
       met5: 0
     },
     pressure: {
@@ -55,7 +53,6 @@ const sensorLabels = {
   side: 'Lateral Externo',
   hallux: 'Hallux (Dedo Gordo)',
   met1: '1er Metatarsiano',
-  met3: '3er Metatarsiano',
   met5: '5to Metatarsiano',
   mid: 'Zona Central'
 };
@@ -332,7 +329,7 @@ function updateDataTable() {
   tableBody.innerHTML = '';
   
   // Temperature rows
-  const tempLocations = ['heel', 'side', 'hallux', 'met1', 'met3', 'met5'];
+  const tempLocations = ['heel', 'side', 'hallux', 'met1', 'met5'];
   tempLocations.forEach(location => {
     if (sensorData.left.temperature[location] !== undefined) {
       const leftTemp = sensorData.left.temperature[location];
@@ -480,7 +477,7 @@ function guardarDatos() {
     };
 
     // Sensores de temperatura
-    ["heel", "side", "hallux", "met1", "met3", "met5"].forEach(loc => {
+    ["heel", "side", "hallux", "met1", "met5"].forEach(loc => {
         datos.temperatura.izquierda[loc] = document.querySelector(`#left-temp-${loc} .sensor-value`)?.textContent || "";
         datos.temperatura.derecha[loc] = document.querySelector(`#right-temp-${loc} .sensor-value`)?.textContent || "";
     });

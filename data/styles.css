@@ -207,7 +207,7 @@ body {
 
 .foot-image {
   width: 100%;
-  max-width: 550px;
+  max-width: 350px;
   height: auto;
   display: block;
 }
@@ -263,28 +263,28 @@ body {
 }
 
 /* Position sensors - Left Foot */
-#left-temp-heel { top: 950px; left: 210px; }
-#left-temp-side { top: 530px; left: 80px; }
-#left-temp-hallux { top: 50px; left: 260px; }
-#left-temp-met1 { top: 180px; left: 300px; }
-#left-temp-met5 { top: 200px; left: 100px; }
+#left-temp-heel { top: 600px; left: 250px; }
+#left-temp-side { top: 400px; left: 140px; }
+#left-temp-hallux { top: 50px; left: 220px; }
+#left-temp-met1 { top: 180px; left: 320px; }
+#left-temp-met5 { top: 200px; left: 120px; }
 
-#left-press-heel { top: 980px; left: 210px; }
-#left-press-met1 { top: 210px; left: 300px; }
-#left-press-met5 { top: 230px; left: 100px; }
-#left-press-mid { top: 560px; left: 80px; }
+#left-press-heel { top: 630px; left: 250px; }
+#left-press-met1 { top: 210px; left: 320px; }
+#left-press-met5 { top: 230px; left: 120px; }
+#left-press-mid { top: 430px; left: 140px; }
 
 /* Position sensors - Right Foot */
-#right-temp-heel { top: 950px; right: 210px; }
-#right-temp-side { top: 530px; right: 80px; }
+#right-temp-heel { top: 600px; right: 210px; }
+#right-temp-side { top: 400px; right: 80px; }
 #right-temp-hallux { top: 50px; right: 260px; }
 #right-temp-met1 { top: 180px; right: 300px; }
 #right-temp-met5 { top: 200px; right: 100px; }
 
-#right-press-heel { top: 980px; right: 210px; }
+#right-press-heel { top: 630px; right: 210px; }
 #right-press-met1 { top: 210px; right: 300px; }
 #right-press-met5 { top: 230px; right: 100px; }
-#right-press-mid { top: 560px; right: 80px; }
+#right-press-mid { top: 430px; right: 80px; }
 
 /* ============================================
    Data Table

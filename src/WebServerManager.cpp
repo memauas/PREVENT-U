@@ -117,7 +117,6 @@ void WebServerManager::handleWebSocketEvent(
     }
 }
 
-
 // =====================================================
 // 🚀 Envía presión + temperatura (orden correctísimo)
 // =====================================================

@@ -27,7 +27,7 @@ const sensorData = {
       heel: 0,
       met1: 0,
       met5: 0,
-      mid: 0
+      side: 0
     }
   },
   right: {
@@ -42,7 +42,7 @@ const sensorData = {
       heel: 0,
       met1: 0,
       met5: 0,
-      mid: 0
+      side: 0
     }
   }
 };
@@ -54,7 +54,7 @@ const sensorLabels = {
   hallux: 'Hallux (Dedo Gordo)',
   met1: '1er Metatarsiano',
   met5: '5to Metatarsiano',
-  mid: 'Zona Central'
+  side: 'Zona Lateral'
 };
 
 // ============================================
@@ -316,9 +316,9 @@ function updateSummaryStats() {
   document.getElementById('max-temp').textContent = `${maxTemp}°C`;
   document.getElementById('min-temp').textContent = `${minTemp}°C`;
   
-  document.getElementById('avg-press').textContent = `${avgPress} N`;
-  document.getElementById('max-press').textContent = `${maxPress} N`;
-  document.getElementById('min-press').textContent = `${minPress} N`;
+  document.getElementById('avg-press').textContent = `${avgPress} KPa`;
+  document.getElementById('max-press').textContent = `${maxPress} KPa`;
+  document.getElementById('min-press').textContent = `${minPress} KPa`;
 }
 
 /**
@@ -352,13 +352,13 @@ function updateDataTable() {
   });
   
   // Pressure rows
-  const pressLocations = ['heel', 'met1', 'met5', 'mid'];
+  const pressLocations = ['heel', 'met1', 'met5', 'side'];
   pressLocations.forEach(location => {
     if (sensorData.left.pressure[location] !== undefined) {
       const leftPress = sensorData.left.pressure[location];
       const rightPress = sensorData.right.pressure[location];
-      const leftCritical = leftPress > 700;
-      const rightCritical = rightPress > 700;
+      const leftCritical = leftPress > 200;
+      const rightCritical = rightPress > 200;
       const leftClass = leftCritical ? 'value-critical' : 'value-normal';
       const rightClass = rightCritical ? 'value-critical' : 'value-normal';
       
@@ -483,7 +483,7 @@ function guardarDatos() {
     });
 
     // Sensores de presión
-    ["heel", "met1", "met5", "mid"].forEach(loc => {
+    ["heel", "met1", "met5", "side"].forEach(loc => {
         datos.presion.izquierda[loc] = document.querySelector(`#left-press-${loc} .sensor-value`)?.textContent || "";
         datos.presion.derecha[loc] = document.querySelector(`#right-press-${loc} .sensor-value`)?.textContent || "";
     });
@@ -505,7 +505,7 @@ function descargarCSV() {
 
     // Sensores a incluir
     const tempKeys = ["heel", "side", "hallux", "met1", "met5"];
-    const pressKeys = ["heel", "met1", "met5", "mid"];
+    const pressKeys = ["heel", "met1", "met5", "side"];
 
     // Etiquetas en español
     const labels = {
@@ -514,7 +514,7 @@ function descargarCSV() {
         hallux: "Hallux (Dedo Gordo)",
         met1: "1er Metatarsiano",
         met5: "5to Metatarsiano",
-        mid: "Zona Central"
+        side: "Zona Lateral"
     };
 
     let csv = "";

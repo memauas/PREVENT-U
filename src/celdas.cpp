@@ -53,89 +53,88 @@ void selectSensor(int channel) {
   delay(3);  // tiempo de asentamiento del mux
 }
 
-// ---------- TARE ----------
+
 // void doTare() {
 //     Serial.println("🔄 Re-tareando...");
 
-//     const int NUM_SAMPLES = 200;        // MUCHÍSIMO más estable
-//     const int SETTLE_MS = 8;            // Tiempo que necesita el MUX
+//     const int NUM_SAMPLES = 200;      // tu valor original
+//     const int SETTLE_MS = 8;          // tu valor original
+//     const unsigned long TIMEOUT_MS = 300;  // tiempo máx para que la celda responda
 
 //     for (int i = 0; i < NUM_CELDAS; i++) {
-//         selectSensor(canales[i]); 
+
+//         selectSensor(canales[i]);
 //         delay(SETTLE_MS);
 
+//         // Antes de leer, asegurarnos de que el HX711 responde
+//         if (!scale.wait_ready_timeout(TIMEOUT_MS)) {
+//             Serial.printf("⚠️ Celda %d NO responde, se mantiene el offset previo (%ld)\n",
+//                           i, tare_offset[i]);
+//             continue;  // NO intentamos leer samples → seguimos a la siguiente
+//         }
+
 //         long sum = 0;
+//         bool lectura_valida = true;
 
 //         for (int k = 0; k < NUM_SAMPLES; k++) {
-//             sum += scale.read();
+
+//             // Si en medio del muestreo se cae la celda → abortamos
+//             if (!scale.wait_ready_timeout(TIMEOUT_MS)) {
+//                 lectura_valida = false;
+//                 break;
+//             }
+
+//             long raw = scale.read();
+
+//             // chequeo rápido de lecturas rotas (overflow típico del HX711)
+//             if (raw == 0 || raw == 0x7FFFFF || raw == 0x800000) {
+//                 lectura_valida = false;
+//                 break;
+//             }
+
+//             sum += raw;
 //             delayMicroseconds(500);
 //         }
 
+//         if (!lectura_valida) {
+//             Serial.printf("⚠️ Lectura inválida en celda %d, NO se actualiza el tare.\n", i);
+//             continue;
+//         }
+
+//         // Si todo OK, actualizar offset
 //         tare_offset[i] = sum / NUM_SAMPLES;
 //         smoothed[i] = 0;
-//         Serial.println("Celda tareada");
+
+//         Serial.printf("✅ Celda %d tareada correctamente. Offset = %ld\n", i, tare_offset[i]);
 //     }
 
-//     Serial.println("✅ Tare completa y estable.");
+//     Serial.println("✔️ Tare completo (con manejo de fallas).");
 // }
-void doTare() {
-    Serial.println("🔄 Re-tareando...");
 
-    const int NUM_SAMPLES = 200;      // tu valor original
-    const int SETTLE_MS = 8;          // tu valor original
-    const unsigned long TIMEOUT_MS = 300;  // tiempo máx para que la celda responda
+void doTare() {
+    Serial.println("🔄 Re-tareando (una por una)...");
+
+    const int NUM_AVG = 50;   // igual que tu ejemplo
 
     for (int i = 0; i < NUM_CELDAS; i++) {
 
+        // Selecciono el canal correcto del multiplexor
         selectSensor(canales[i]);
-        delay(SETTLE_MS);
 
-        // Antes de leer, asegurarnos de que el HX711 responde
-        if (!scale.wait_ready_timeout(TIMEOUT_MS)) {
-            Serial.printf("⚠️ Celda %d NO responde, se mantiene el offset previo (%ld)\n",
-                          i, tare_offset[i]);
-            continue;  // NO intentamos leer samples → seguimos a la siguiente
-        }
+        // Leo el promedio para tare
+        tare_offset[i] = scale.read_average(NUM_AVG);
 
-        long sum = 0;
-        bool lectura_valida = true;
+        // Inicializo el valor suavizado
+        // (si usás calibración individual)
+        #ifdef CAL
+            smoothed[i] = (scale.read() - tare_offset[i]) / CAL[i];
+        #else
+            smoothed[i] = scale.read() - tare_offset[i];
+        #endif
 
-        for (int k = 0; k < NUM_SAMPLES; k++) {
-
-            // Si en medio del muestreo se cae la celda → abortamos
-            if (!scale.wait_ready_timeout(TIMEOUT_MS)) {
-                lectura_valida = false;
-                break;
-            }
-
-            long raw = scale.read();
-
-            // chequeo rápido de lecturas rotas (overflow típico del HX711)
-            if (raw == 0 || raw == 0x7FFFFF || raw == 0x800000) {
-                lectura_valida = false;
-                break;
-            }
-
-            sum += raw;
-            delayMicroseconds(500);
-        }
-
-        if (!lectura_valida) {
-            Serial.printf("⚠️ Lectura inválida en celda %d, NO se actualiza el tare.\n", i);
-            continue;
-        }
-
-        // Si todo OK, actualizar offset
-        tare_offset[i] = sum / NUM_SAMPLES;
-        smoothed[i] = 0;
-
-        Serial.printf("✅ Celda %d tareada correctamente. Offset = %ld\n", i, tare_offset[i]);
+        Serial.printf("  ➤ Celda %d tareada. Offset = %ld\n", i+1, tare_offset[i]);
     }
-
-    Serial.println("✔️ Tare completo (con manejo de fallas).");
-}
-
-
+    }
 
 // ---------- Inicialización ----------
 void initCeldas() {

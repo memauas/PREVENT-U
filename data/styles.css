@@ -272,7 +272,7 @@ body {
 #left-press-heel { top: 630px; left: 250px; }
 #left-press-met1 { top: 210px; left: 320px; }
 #left-press-met5 { top: 230px; left: 120px; }
-#left-press-mid { top: 430px; left: 140px; }
+#left-press-side { top: 430px; left: 140px; }
 
 /* Position sensors - Right Foot */
 #right-temp-heel { top: 600px; right: 210px; }
@@ -284,7 +284,7 @@ body {
 #right-press-heel { top: 630px; right: 210px; }
 #right-press-met1 { top: 210px; right: 300px; }
 #right-press-met5 { top: 230px; right: 100px; }
-#right-press-mid { top: 430px; right: 80px; }
+#right-press-side { top: 430px; right: 80px; }
 
 /* ============================================
    Data Table
@@ -392,7 +392,7 @@ body {
   #left-press-heel, #right-press-heel { top: 802px; }
   #left-press-met1, #right-press-met1 { top: 172px; }
   #left-press-met5, #right-press-met5 { top: 188px; }
-  #left-press-mid, #right-press-mid { top: 458px; }
+  #left-press-side, #right-press-side { top: 458px; }
 
   #left-temp-heel { left: 172px; }
   #left-temp-side { left: 65px; }
@@ -402,7 +402,7 @@ body {
   #left-press-heel { left: 172px; }
   #left-press-met1 { left: 246px; }
   #left-press-met5 { left: 82px; }
-  #left-press-mid { left: 164px; }
+  #left-press-side { left: 164px; }
 
   #right-temp-heel { right: 172px; }
   #right-temp-side { right: 65px; }
@@ -412,7 +412,7 @@ body {
   #right-press-heel { right: 172px; }
   #right-press-met1 { right: 246px; }
   #right-press-met5 { right: 82px; }
-  #right-press-mid { right: 164px; }
+  #right-press-side { right: 164px; }
 }
 
 @media (max-width: 768px) {
@@ -457,7 +457,7 @@ body {
   #left-press-heel, #right-press-heel { top: 624px; }
   #left-press-met1, #right-press-met1 { top: 134px; }
   #left-press-met5, #right-press-met5 { top: 146px; }
-  #left-press-mid, #right-press-mid { top: 357px; }
+  #left-press-side, #right-press-side { top: 357px; }
 
   #left-temp-heel { left: 134px; }
   #left-temp-side { left: 51px; }
@@ -467,7 +467,7 @@ body {
   #left-press-heel { left: 134px; }
   #left-press-met1 { left: 191px; }
   #left-press-met5 { left: 64px; }
-  #left-press-mid { left: 127px; }
+  #left-press-side { left: 127px; }
 
   #right-temp-heel { right: 134px; }
   #right-temp-side { right: 51px; }
@@ -477,7 +477,7 @@ body {
   #right-press-heel { right: 134px; }
   #right-press-met1 { right: 191px; }
   #right-press-met5 { right: 64px; }
-  #right-press-mid { right: 127px; }
+  #right-press-side { right: 127px; }
 }
 
 /* ============================================

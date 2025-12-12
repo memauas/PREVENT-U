@@ -143,7 +143,10 @@ body {
   transform: translateY(-5px);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
-
+.summary-card:hover, .foot-card:hover {
+  transform: scale(1.03);
+  transition: 0.2s ease;
+}
 .summary-card h3 {
   font-size: 1.5rem;
   margin-bottom: 1.5rem;
@@ -243,13 +246,13 @@ body {
 
 .sensor-temp {
   background: rgba(255, 99, 71, 0.85);
-  color: white;
+  color: rgb(255, 255, 255);
   border: 2px solid rgba(255, 69, 0, 0.8);
 }
 
 .sensor-press {
   background: rgba(100, 149, 237, 0.85);
-  color: white;
+  color: rgb(255, 255, 255);
   border: 2px solid rgba(65, 105, 225, 0.8);
 }
 
@@ -261,6 +264,19 @@ body {
   font-size: 0.75rem;
   opacity: 0.95;
 }
+.sensor-box {
+  position: relative;
+  overflow: hidden;
+}
+.sensor-box .bar {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 0%;
+  background: rgba(255,0,0,0.4);
+  transition: height 0.3s ease;
+}
+
 
 /* Position sensors - Left Foot */
 #left-temp-heel { top: 600px; left: 250px; }
@@ -269,22 +285,24 @@ body {
 #left-temp-met1 { top: 180px; left: 320px; }
 #left-temp-met5 { top: 200px; left: 120px; }
 
+#left-press-hallux { top: 80px; left: 220px; }
 #left-press-heel { top: 630px; left: 250px; }
 #left-press-met1 { top: 210px; left: 320px; }
 #left-press-met5 { top: 230px; left: 120px; }
 #left-press-side { top: 430px; left: 140px; }
 
 /* Position sensors - Right Foot */
-#right-temp-heel { top: 600px; right: 210px; }
-#right-temp-side { top: 400px; right: 80px; }
+#right-temp-heel { top: 600px; right: 270px; }
+#right-temp-side { top: 400px; right: 140px; }
 #right-temp-hallux { top: 50px; right: 260px; }
-#right-temp-met1 { top: 180px; right: 300px; }
-#right-temp-met5 { top: 200px; right: 100px; }
+#right-temp-met1 { top: 180px; right: 330px; }
+#right-temp-met5 { top: 200px; right: 130px; }
 
-#right-press-heel { top: 630px; right: 210px; }
-#right-press-met1 { top: 210px; right: 300px; }
-#right-press-met5 { top: 230px; right: 100px; }
-#right-press-side { top: 430px; right: 80px; }
+#right-press-hallux { top: 80px; right: 260px; }
+#right-press-heel { top: 630px; right: 270px; }
+#right-press-met1 { top: 210px; right: 330px; }
+#right-press-met5 { top: 230px; right: 130px; }
+#right-press-side { top: 430px; right: 140px; }
 
 /* ============================================
    Data Table
@@ -389,6 +407,7 @@ body {
   #left-temp-met1, #right-temp-met1 { top: 147px; }
   #left-temp-met5, #right-temp-met5 { top: 164px; }
 
+  #left-press-hallux, #right-press-hallux { top: 41px; }
   #left-press-heel, #right-press-heel { top: 802px; }
   #left-press-met1, #right-press-met1 { top: 172px; }
   #left-press-met5, #right-press-met5 { top: 188px; }
@@ -519,4 +538,113 @@ body {
   to {
     opacity: 0.6;
   }
+}
+
+/* Gradiente con color-stops alineados a 20..40°C */
+.temp-gradient {
+  background: linear-gradient(
+    to top,
+    /* 20°C -> 0% */
+    rgb(40, 60, 170)  0%,
+    /* 22°C -> 10% */
+    rgb(60, 80, 200) 25%,
+    /* 24°C -> 20% */
+    rgb(80, 120, 220) 40%,
+    /* 26°C -> 30% */
+    rgb(25, 103, 79) 50%,
+    rgb(60, 160, 130) 60%,
+    /* 28°C -> 40% (aquí sería amarillo; 27 cae entre 30% y 40% y se verá amarillo) */
+    rgb(200, 200, 60) 70%,
+    /* 32°C -> 60% */
+    rgb(220, 120, 40) 80%,
+    /* 40°C -> 100% */
+    rgb(180, 40, 40) 100%
+  );
+  border-radius: 12px;
+  width: 28px;
+  height: 360px; /* ajustá según tu leyenda */
+  margin: 0 auto;
+}
+
+
+
+/* Presión suave */
+.press-gradient {
+  background: linear-gradient(
+    to top,
+    rgb(40, 60, 170)  0%,
+    rgb(60, 80, 200) 10%,
+    rgb(80, 120, 220) 20%,
+    rgb(25, 103, 79) 40%,
+    rgb(60, 160, 130) 55%,
+    rgb(200, 200, 60) 60%,
+    rgb(220, 120, 40) 80%,
+    rgb(180, 40, 40) 100%
+  );
+}
+
+
+/* Contenedor horizontal barra + labels */
+
+/* Barra vertical */
+
+/* Columnita de labels */
+
+/* Contenedor lateral */
+#side-legends {
+  background: linear-gradient(
+    180deg,
+    rgba(60, 0, 20, 0.85),
+    rgba(80, 0, 30, 0.85)
+  );
+  border-radius: 20px;
+  padding: 25px 15px;
+  margin-left: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  height: 795px;
+  width: 200px;
+
+}
+
+/* Títulos */
+.legend-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #f5f5f5;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+/* Legend container general */
+.legend-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Barra + labels alineados */
+.legend-wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.legend-bar {
+  width: 25px;
+  height: 320px;
+  border-radius: 12px;
+  margin-right: 12px;
+  box-shadow: inset 0 0 8px rgba(0,0,0,0.4);
+}
+
+/* Columnita de labels */
+.legend-labels {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 320px;
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
 }

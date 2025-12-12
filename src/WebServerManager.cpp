@@ -29,6 +29,23 @@ void WebServerManager::begin(const char* ssid, const char* password, int port) {
 
     server->addHandler(ws);
     setupRoutes();
+    //Endpoint Login
+    server->on("/login", HTTP_POST, [](AsyncWebServerRequest *request) {
+        if (!request->hasParam("user", true) || !request->hasParam("pass", true)) {
+            request->send(400, "text/plain", "Missing fields");
+            return;
+        }
+
+        String user = request->getParam("user", true)->value();
+        String pass = request->getParam("pass", true)->value();
+
+        if (WebServerManager::checkCredentials(user, pass)) {
+            request->send(200, "text/plain", "OK");
+        } else {
+            request->send(403, "text/plain", "INVALID");
+        }
+    });  
+    
     server->begin();
 
     Serial.println("=== WebServer started successfully ===");
@@ -72,9 +89,17 @@ void WebServerManager::connectWiFi(const char* ssid, const char* password) {
 
 void WebServerManager::setupRoutes() {
     server->on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-        request->send(LittleFS, "/index.html", "text/html");
+        request->send(LittleFS, "/login.html", "text/html");
+    });
+    
+    server->on("/login.html", HTTP_GET, [](AsyncWebServerRequest *request) {
+        request->send(LittleFS, "/login.html", "text/html");
     });
 
+    // 🔹 Página principal (index) — accesible después del login
+    server->on("/index.html", HTTP_GET, [](AsyncWebServerRequest *request) {
+        request->send(LittleFS, "/index.html", "text/html");
+    });
     server->on("/styles.css", HTTP_GET, [](AsyncWebServerRequest *request) {
         request->send(LittleFS, "/styles.css", "text/css");
     });
@@ -83,7 +108,7 @@ void WebServerManager::setupRoutes() {
         request->send(LittleFS, "/script.js", "text/javascript");
     });
 
-    server->serveStatic("/images", LittleFS, "/images/");
+    server->serveStatic("/", LittleFS, "/");
 
     server->onNotFound([](AsyncWebServerRequest *request) {
         request->send(404, "text/plain", "Not found");
@@ -118,11 +143,12 @@ void WebServerManager::handleWebSocketEvent(
 }
 
 // =====================================================
-// 🚀 Envía presión + temperatura (orden correctísimo)
+// Envía presión + temperatura 
 // =====================================================
+
 void WebServerManager::broadcastSensorData(
-    const float leftPress[4],
-    const float rightPress[4],
+    const float leftPress[5],
+    const float rightPress[5],
     const float leftTemp[5],
     const float rightTemp[5]
 ) {
@@ -145,6 +171,8 @@ void WebServerManager::broadcastSensorData(
     lp["met1"] = leftPress[1];
     lp["side"] = leftPress[2];
     lp["heel"] = leftPress[3];
+    lp["hallux"] = leftPress[4];
+
     // -------- RIGHT FOOT --------
     JsonObject right = doc.createNestedObject("right");
 
@@ -160,8 +188,37 @@ void WebServerManager::broadcastSensorData(
     rp["met5"] = rightPress[1];
     rp["side"] = rightPress[2];
     rp["heel"] = rightPress[3];
+    lp["hallux"] = leftPress[4];
 
     String jsonString;
     serializeJson(doc, jsonString);
     ws->textAll(jsonString);
+}
+
+bool WebServerManager::checkCredentials(const String& user, const String& pass) {
+    File file = LittleFS.open("/users.csv", "r");
+    if (!file) {
+        Serial.println("No se pudo abrir users.csv");
+        return false;
+    }
+
+    while (file.available()) {
+        String line = file.readStringUntil('\n');
+        line.trim();
+
+        if (line.length() == 0) continue;
+        int comma = line.indexOf(',');
+        if (comma < 0) continue;
+
+        String u = line.substring(0, comma);
+        String p = line.substring(comma + 1);
+
+        if (u == user && p == pass) {
+            Serial.println("Login correcto!");
+            return true;
+        }
+    }
+
+    Serial.println("Login incorrecto");
+    return false;
 }

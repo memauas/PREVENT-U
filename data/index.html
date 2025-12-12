@@ -7,12 +7,19 @@
   <title>PREVENT-U</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@2/dist/email.min.js"></script>
+  <script>
+  emailjs.init("cjQFsksYwPJAr9DmA");
+</script>
 </head>
 <body>
   <!-- Header -->
   <header class="header">
   <div class="container header-container">
-    <img src="images/LogoPrevent_FondoTransparente.png" alt="Logo PREVENT-U" class="header-logo">
+    <img src="logo.png" alt="Logo PREVENT-U" class="header-logo">
   </div>
   </header>
 
@@ -77,13 +84,14 @@
     </div>
 
     <!-- Feet Visualization -->
-    <div class="row">
+    <div class="row d-flex">
+
       <!-- Left Foot -->
-      <div class="col-lg-6 mb-4">
+      <div class="col-lg-5 mb-4">
         <div class="foot-card">
           <h3 class="foot-title">Pie Izquierdo</h3>
           <div class="foot-container">
-            <img src="images/pie_izquierdo.png" alt="Pie Izquierdo" class="foot-image">
+            <img src="pie.png" alt="Pie Izquierdo" class="foot-image">
             
             <!-- Temperature Sensors - Left Foot -->
             <div id="left-temp-heel" class="sensor sensor-temp" data-position="top: 470px; left: 120px;">
@@ -108,6 +116,10 @@
             </div>
 
             <!-- Pressure Sensors - Left Foot -->
+            <div id="left-press-hallux" class="sensor sensor-press" data-position="top: 490px; left: 120px;">
+              <span class="sensor-value">--</span>
+              <span class="sensor-unit">KPa</span>
+            </div>
             <div id="left-press-heel" class="sensor sensor-press" data-position="top: 490px; left: 120px;">
               <span class="sensor-value">--</span>
               <span class="sensor-unit">KPa</span>
@@ -129,11 +141,12 @@
       </div>
 
       <!-- Right Foot -->
-      <div class="col-lg-6 mb-4">
+      <div class="col-lg-5 mb-4">
         <div class="foot-card">
           <h3 class="foot-title">Pie Derecho</h3>
           <div class="foot-container">
-            <img src="images/pie_izquierdo.png" alt="Pie Derecho" class="foot-image foot-image-flipped">
+            <img src="pie.png" alt="Pie Derecho" class="foot-image foot-image-flipped">
+
             <!-- Temperature Sensors - Right Foot (mirrored positions) -->
             <div id="right-temp-heel" class="sensor sensor-temp" data-position="top: 470px; right: 120px;">
               <span class="sensor-value">--</span>
@@ -157,6 +170,10 @@
             </div>
 
             <!-- Pressure Sensors - Right Foot (mirrored positions) -->
+            <div id="right-press-hallux" class="sensor sensor-press" data-position="top: 490px; right: 120px;">
+              <span class="sensor-value">--</span>
+              <span class="sensor-unit">KPa</span>
+            </div>
             <div id="right-press-heel" class="sensor sensor-press" data-position="top: 490px; right: 120px;">
               <span class="sensor-value">--</span>
               <span class="sensor-unit">KPa</span>
@@ -176,7 +193,54 @@
           </div>
         </div>
       </div>
-    </div>
+
+      <!-- Right Side Legends -->
+      <div class="col-lg-2 d-flex flex-column align-items-center" id="side-legends">
+
+        <!-- Temperature Bar -->
+        <div class="legend-container mb-4">
+          <div class="legend-title">Temperatura (°C)</div>
+          <div class="legend-wrapper">
+            <div class="legend-bar temp-gradient"></div>
+            <div class="legend-labels">
+              <span>44</span> <!-- Rojo -->
+              <span>42</span>
+              <span>40</span> <!-- Rojo -->
+              <span>38</span> <!-- Rojo -->
+              <span>36</span> <!-- Rojo -->
+              <span>34</span> <!-- Rojo -->
+              <span>32</span> <!-- Naranja -->
+              <span>30</span> <!-- Entre amarillo y naranja -->
+              <span>28</span> <!-- Amarillo -->
+              <span>26</span> <!-- Verde -->
+            </div>
+          </div>
+        </div>
+
+        <div class="legend-container">
+          <div class="legend-title">Presión (kPa)</div>
+          <div class="legend-wrapper">
+            <div class="legend-bar press-gradient"></div>
+            <div class="legend-labels">
+              <span>240</span>
+              <span>220</span>
+              <span>200</span>
+              <span>180</span>
+              <span>140</span>
+              <span>120</span>
+              <span>100</span>
+              <span>80</span>
+              <span>40</span>
+              <span>20</span>
+              <span>10</span>
+              <span>5</span>
+              <span>0</span>
+            </div>
+          </div>
+        </div>
+
+
+      </div>
 
     <!-- Detailed Data Table -->
     <div class="data-table-container">
@@ -203,8 +267,31 @@
   <div class="d-flex gap-2 mt-3 justify-content-center mb-4">
   <button id="guardar-btn" class="btn btn-light">💾 Guardar Datos</button>
   <button id="descargar-btn" class="btn btn-light">📥 Descargar CSV</button>
-  </div>
+  <button id="tendencias-btn" class="btn btn-light">Ver Tendencias</button>
+  <button id="informe-btn" class="btn btn-light">Ver Informe</button>
 
+  </div>
+  <!-- Modal para Tendencias -->
+  <div class="modal fade" id="tendenciasModal" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Tendencias de Sensores</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+
+          <div id="charts-container">
+            <!-- Charts inserted by JS -->
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <canvas id="chartCanvas" width="900" height="400" style="display:none;"></canvas>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

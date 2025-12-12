@@ -20,11 +20,12 @@ public:
     // 🚀 FUNCIÓN COMPLETA: presión + temperatura
     // =====================================================
     void broadcastSensorData(
-        const float leftPress[4],
-        const float rightPress[4],
+        const float leftPress[5],
+        const float rightPress[5],
         const float leftTemp[5],
         const float rightTemp[5]
     );
+    static bool checkCredentials(const String& user, const String& pass); //login
 
 private:
     bool initFileSystem();

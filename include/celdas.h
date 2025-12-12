@@ -5,7 +5,7 @@
 #include "HX711.h"
 
 // --- Cantidad de celdas ---
-#define NUM_CELDAS 8
+#define NUM_CELDAS 10
 
 // Inicializa pines, HX711, MUX y hace tare inicial
 void initCeldas();

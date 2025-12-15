@@ -31,15 +31,12 @@ HX711 scale;
 const int canales[NUM_CELDAS] = {0,1,2,3,4,5,6,7,8,9};
 
 // ---------- Calibración ----------
-// const float CAL[NUM_CELDAS] = {
-//   44.647663, 45.054718, 44.557652, 44.690796,
-//   43.551414, 43.750851, 43.353813, 44.294262
-// };
-
 const float CAL[NUM_CELDAS] = {
-  200, 200, 200, 200,
-  200, 200, 200, 200, 200, 200
-};
+  44.647663, 45.054718, 44.557652, 44.690796,
+  43.551414, 43.750851, 43.353813, 44.294262, 
+  45.548629, 45.519644};
+
+
 
 long tare_offset[NUM_CELDAS] = {0};
 
@@ -57,7 +54,7 @@ void selectSensor(int channel) {
     digitalWrite(mux2_pins[i], (channel >> i) & 0x01);
   }
 
-  delay(3);  // tiempo de asentamiento del mux
+  delay(1);  // tiempo de asentamiento del mux
 }
 
 
@@ -127,3 +124,4 @@ void getCellValues(float outValues[NUM_CELDAS]) {
         outValues[i] = smoothed2[i];
     }
 }
+

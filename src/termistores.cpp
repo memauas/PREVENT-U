@@ -9,14 +9,29 @@
 #define SIG_T 34
 
 int canalesTermistores[10] = {15, 14, 13, 12, 11, 10, 9, 8, 7, 6};
+
 // Parámetros
-const double R_SERIE_CALIBRADA = 8150.0;
+const double R_SERIE_CALIBRADA = 10000.0;
 const double R_PARALELA = 10000.0;
 const double ADC_MAX = 4095.0;
 
 struct SteinhartCoefs { float A, B, C; };
 SteinhartCoefs configs[16];
 
+
+float offsetsTemp[16] = {
+ 0,0,0,0,0,
+    2,            // canal 6
+    0.73,            // canal 7
+    2,            // canal 8
+    1.5,           // canal 9
+    -0.15,           // canal 10
+    0.7,            // canal 11
+    -2,            // canal 12
+    1.09,            // canal 13
+    1.20,            // canal 14
+    1.3             // canal 15
+};
 
 void initTermistores() {
     pinMode(S0_T, OUTPUT);
@@ -26,16 +41,16 @@ void initTermistores() {
     pinMode(SIG_T, INPUT);
    
     // Tus coeficientes calibrados
-    configs[13] = {0.0003445997, 0.0003633891, -4.478e-7}; //T1 3
-    configs[10] = {0.0002314524, 0.0003842840, -5.495e-7}; //T2 6
-    configs[8] = {0.0005570546, 0.0003313903, -3.426e-7}; //T3 8
-    configs[11] = {-0.0000332643, 0.0004245515, -6.796e-7}; //T4 5
-    configs[15] = {0.0005184773, 0.0003382271, -3.688e-7}; //T5 1
-    configs[9] = {0.0005088505, 0.0003425892, -4.048e-7}; //T6 7
-    configs[14] = {0.0006721010, 0.0003083060, -2.146e-7}; //T7 2
-    configs[12] = {0.0003609723, 0.0003621767, -4.409e-7}; //T8 4
-    configs[7] = {0.0006409455, 0.0003150994, -2.552e-7}; //T9 10
-    configs[6] = {0.0006081904, 0.0003184497, -2.436e-7}; //T10 9
+    configs[13] = {0.001193349566522334, 0.0002166857413151746, 2.3045800967282677e-7};
+    configs[10] = {0.0011343204985665573, 0.00022466165275112574, 1.979051797627113e-7};
+    configs[8]  = {0.0012102788297408103, 0.00020975924823460253, 2.8586948453119277e-7};
+    configs[11] = {0.0013356592011885891, 0.00018897383921622952, 3.643167584255805e-7};
+    configs[15] = {0.0015191263353988007, 0.00015363037614426922, 5.466478097450368e-7};
+    configs[9]  = {0.001552217686568973, 0.00015071917696941108, 5.333542706722855e-7};
+    configs[14] = {0.0010279078574312555, 0.00024405713599303747, 1.192346379913156e-7};
+    configs[12] = {0.0013037425676406368, 0.00019372037307783065, 3.5244096442775185e-7};
+    configs[7]  = {0.0012276027733045497, 0.00021069085776341236, 2.5279663334087364e-7};
+    configs[6]  = {0.0014856675620528422, 0.00016446981352987453, 4.651435166769681e-7};
 
     Serial.println("Termistores inicializados.");
 }
@@ -70,17 +85,9 @@ float leerTemperaturaCanal(int canal) {
                          configs[canal].B * logR +
                          configs[canal].C * pow(logR, 3))) - 273.15;
 
-    // if (canal == 8) temp += 1;   // T10
-    // // if (canal == 0) temp += 0.7;   // T5
-    // // if (canal == 1) temp += 0.4;   // T7
-    // if (canal == 2) temp -= 0.7;   // T1
-    // if (canal == 3) temp += 1.0;   // T8
-    // if (canal == 4) temp += 1.2;   // T4
-    // // if (canal == 5) temp += 1.3;   // T2
-    // // if (canal == 6) temp += 0.7;   // T6
-    // if (canal == 7) temp += 0.7;   // T3
-    // // if (canal == 9) temp += 1.0;   // T9
-    
+
+    temp += offsetsTemp[canal];
+
     return temp;
 }
 
